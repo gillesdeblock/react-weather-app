@@ -1,47 +1,63 @@
 import { FocusEventHandler, useEffect, useRef, useState } from 'react'
-import type { LocationSearchResult } from '../types'
+import type { City } from '../types'
 import { twMerge } from 'tailwind-merge'
 import GeocodingApi from '../api/GeocodingApi'
-import Button from './Button'
 import SearchInput from './SearchInput'
 import useDebounce from '../hooks/useDebounce'
 import useMousedownOutside from '../hooks/useMousedownOutside'
+import Icon from './Icon'
+import { useCity, useCityDispatch } from '../contexts/CityContext'
 
 function WeatherLookup() {
   const [input, setInput] = useState('')
-  const debouncedInput = useDebounce(input)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState([])
-  const inputRef = useRef<HTMLElement>(null)
+  const [resultsVisible, setResultsVisible] = useState(false)
+  const debouncedInput = useDebounce(input, 200)
   const api = new GeocodingApi()
-  const isResultsVisible = results.length > 0
+  const city = useCity()
+  const cityDispatch = useCityDispatch()
 
   const handleSearch = async () => {
     if (loading) {
       return
     }
+    if (!input.length) {
+      setResultsVisible(false)
+      setResults([])
+      return
+    }
     try {
       setLoading(true)
+      setResultsVisible(false)
       const response = await api.fetchLocation(input)
       if (!response.ok) {
         throw new Error('Response status: ' + response.status)
       }
       const result = await response.json()
       setResults(result?.results || [])
+      setResultsVisible(true)
+    } catch (error) {
+      setResultsVisible(false)
     } finally {
       setLoading(false)
     }
   }
 
-  const onCloseResults = () => setResults([])
-  const onSelectResult = (result: LocationSearchResult) => {
-    console.log('selected result', result.name)
+  const onCloseResults = () => {
+    setResultsVisible(false)
+    setResults([])
+  }
+  const onSelectResult = (result: City) => {
+    if (cityDispatch) {
+      cityDispatch({ type: 'select', city: result })
+    }
     onCloseResults()
   }
 
   const onFocus: FocusEventHandler<HTMLInputElement> = (e) => {
     e.stopPropagation()
-    if (!isResultsVisible) {
+    if (!resultsVisible) {
       handleSearch()
     }
   }
@@ -56,31 +72,30 @@ function WeatherLookup() {
       <div className="flex gap-2 items-center relative">
         <div className="w-full relative">
           <SearchInput
-            ref={inputRef}
             className="w-full text-2xl"
             name="city-search"
             placeholder="Enter a city"
             value={input}
             onInput={setInput}
             onFocus={onFocus}
-            onEnter={handleSearch}
           ></SearchInput>
-          {isResultsVisible && (
-            <WeatherLookupResults
-              className="absolute w-full top-full left-0 -translate-y-px max-h-48 overflow-y-auto"
-              results={results}
-              onSelect={onSelectResult}
-              onClose={onCloseResults}
-            ></WeatherLookupResults>
-          )}
+          {resultsVisible &&
+            (results.length > 0 ? (
+              <WeatherLookupResults
+                className="absolute w-full top-full left-0 -translate-y-px max-h-48 overflow-y-auto"
+                results={results}
+                onSelect={onSelectResult}
+                onClose={onCloseResults}
+              ></WeatherLookupResults>
+            ) : (
+              <div className="mt-2 flex items-center">
+                <Icon className="mr-1 text-red-400" fill={1}>
+                  error
+                </Icon>
+                <span>No places found with this name</span>
+              </div>
+            ))}
         </div>
-        <Button
-          className="self-stretch flex items-center"
-          disabled={loading}
-          onClick={handleSearch}
-        >
-          <span className="material-symbols-outlined">search</span>
-        </Button>
       </div>
     </div>
   )
@@ -93,8 +108,8 @@ function WeatherLookupResults({
   onClose,
 }: {
   className?: string
-  results: LocationSearchResult[]
-  onSelect: (result: LocationSearchResult) => void
+  results: City[]
+  onSelect: (result: City) => void
   onClose: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)

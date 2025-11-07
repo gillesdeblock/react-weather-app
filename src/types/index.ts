@@ -3,7 +3,7 @@ export type Position = {
   lat: number
 }
 
-export type LocationSearchResult = {
+export type City = {
   id: string
   name: string
   longitude: number

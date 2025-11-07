@@ -7,8 +7,8 @@ type SearchInputProps = {
   placeholder?: string
   className?: string
   onInput: (newValue: string) => void
-  onFocus: FocusEventHandler<HTMLInputElement>
-  onEnter: (value: string) => void
+  onEnter?: (value: string) => void
+  onFocus?: FocusEventHandler<HTMLInputElement>
   ref?: RefObject<any>
 }
 
@@ -18,8 +18,8 @@ function SearchInput({
   placeholder = '',
   className = '',
   onInput,
-  onFocus,
-  onEnter,
+  onFocus = () => {},
+  onEnter = () => {},
   ref,
 }: SearchInputProps) {
   const onKeyDown = (key: string) => {
