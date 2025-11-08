@@ -11,6 +11,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "maplibre-gl": "^5.11.0",
     "material-symbols": "^0.39.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

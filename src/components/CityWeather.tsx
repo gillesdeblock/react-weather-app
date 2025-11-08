@@ -1,10 +1,13 @@
 import type { City, CurrentWeather, Weather } from '../types'
 import { ReactNode, useEffect, useState } from 'react'
 import { useCity, useCityDispatch } from '../contexts/CityContext'
-import Card from './Card'
-import WeatherApi from '../api/WeatherApi'
-import Icon from './Icon'
 import { humanizeWindDirection } from '../utils'
+import WeatherApi from '../api/WeatherApi'
+import Card from './Card'
+import Icon from './Icon'
+import Map from './Map'
+import { MapProvider } from '../contexts/MapContext'
+import CityMarker from './CityMarker'
 
 function CityWeather() {
   const city = useCity()
@@ -75,6 +78,10 @@ function CityWeather() {
       ) : (
         <span>Loading...</span>
       )}
+      <MapProvider>
+        <Map className="flex-1" />
+        <CityMarker city={city} />
+      </MapProvider>
     </div>
   )
 }
