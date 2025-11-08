@@ -8,7 +8,7 @@ import useMousedownOutside from '../hooks/useMousedownOutside'
 import Icon from './Icon'
 import { useCity, useCityDispatch } from '../contexts/CityContext'
 
-function WeatherLookup() {
+function CitySearch() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState([])
@@ -81,12 +81,12 @@ function WeatherLookup() {
           ></SearchInput>
           {resultsVisible &&
             (results.length > 0 ? (
-              <WeatherLookupResults
+              <CitySearchResults
                 className="absolute w-full top-full left-0 -translate-y-px max-h-48 overflow-y-auto"
                 results={results}
                 onSelect={onSelectResult}
                 onClose={onCloseResults}
-              ></WeatherLookupResults>
+              ></CitySearchResults>
             ) : (
               <div className="mt-2 flex items-center">
                 <Icon className="mr-1 text-red-400" fill={1}>
@@ -101,7 +101,7 @@ function WeatherLookup() {
   )
 }
 
-function WeatherLookupResults({
+function CitySearchResults({
   className = '',
   results,
   onSelect,
@@ -130,4 +130,4 @@ function WeatherLookupResults({
   )
 }
 
-export default WeatherLookup
+export default CitySearch

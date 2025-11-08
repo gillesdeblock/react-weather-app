@@ -16,11 +16,11 @@ export function CityProvider({ children }: { children: ReactNode }) {
   const [city, dispatch] = useReducer(cityReducer, null)
 
   return (
-    <div>
+    <>
       <CityContext value={city}>
         <CityDispatchContext value={dispatch}>{children}</CityDispatchContext>
       </CityContext>
-    </div>
+    </>
   )
 }
 
