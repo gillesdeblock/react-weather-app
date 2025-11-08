@@ -1,6 +1,6 @@
 import type { City, CurrentWeather, Weather } from '../types'
 import { ReactNode, useEffect, useState } from 'react'
-import { useCity } from '../contexts/CityContext'
+import { useCity, useCityDispatch } from '../contexts/CityContext'
 import Card from './Card'
 import WeatherApi from '../api/WeatherApi'
 import Icon from './Icon'
@@ -8,6 +8,7 @@ import { humanizeWindDirection } from '../utils'
 
 function CityWeather() {
   const city = useCity()
+  const cityDispatch = useCityDispatch()
   const [weather, setWeather] = useState<Weather | null>(null)
 
   const getStatisticDisplayValue = (key: keyof CurrentWeather): string | undefined => {
@@ -18,6 +19,12 @@ function CityWeather() {
       return `${weather.current_weather[key]}`
     }
     return `${weather.current_weather[key]} ${weather.current_weather_units[key]}`
+  }
+
+  const onClose = () => {
+    if (cityDispatch) {
+      cityDispatch({ type: 'unselect' })
+    }
   }
 
   useEffect(() => {
@@ -36,8 +43,14 @@ function CityWeather() {
 
   return (
     <div className="absolute-center w-3/4 h-3/4 flex flex-col gap-3">
-      <div className="text-3xl font-semibold text-center">
-        Weather in <span className="font-bold">{city?.name}</span>
+      <div className="text-3xl text-center">
+        Weather in <strong>{city?.name}</strong>
+        <Icon
+          className="ml-1 align-middle hover:cursor-pointer text-red-700 font-bold"
+          onClick={onClose}
+        >
+          clear
+        </Icon>
       </div>
       {weather ? (
         <>
@@ -46,15 +59,15 @@ function CityWeather() {
           </span>
           <div className="grid grid-cols-3 gap-6">
             <CityWeatherStatistic>
-              <span className="text-xl font-semibold">Temperature</span>
+              <span className="text-xl text-center font-semibold">Temperature</span>
               <span>{getStatisticDisplayValue('temperature')}</span>
             </CityWeatherStatistic>
             <CityWeatherStatistic>
-              <span className="text-xl font-semibold">Wind speed</span>
+              <span className="text-xl text-center font-semibold">Wind speed</span>
               <span>{getStatisticDisplayValue('windspeed')}</span>
             </CityWeatherStatistic>
             <CityWeatherStatistic>
-              <span className="text-xl font-semibold">Wind direction</span>
+              <span className="text-xl text-center font-semibold">Wind direction</span>
               <WindDirection degrees={weather.current_weather.winddirection}></WindDirection>
             </CityWeatherStatistic>
           </div>
@@ -79,10 +92,10 @@ function CityWeatherStatistic({ children }: { children: ReactNode }) {
 function WindDirection({ degrees }: { degrees: number }) {
   return (
     <div className="flex flex-col gap-2">
-      <span style={{ scale: 1.25, rotate: `${degrees}deg` }}>
+      <span style={{ scale: 1.25, rotate: `${degrees}deg`, transformOrigin: 'center' }}>
         <Icon>arrow_warm_up</Icon>
       </span>
-      <span>{humanizeWindDirection(degrees)}</span>
+      <span className="text-center">{humanizeWindDirection(degrees)}</span>
     </div>
   )
 }

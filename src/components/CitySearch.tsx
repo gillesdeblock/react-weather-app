@@ -6,7 +6,7 @@ import SearchInput from './SearchInput'
 import useDebounce from '../hooks/useDebounce'
 import useMousedownOutside from '../hooks/useMousedownOutside'
 import Icon from './Icon'
-import { useCity, useCityDispatch } from '../contexts/CityContext'
+import { useCityDispatch } from '../contexts/CityContext'
 
 function CitySearch() {
   const [input, setInput] = useState('')
@@ -15,7 +15,6 @@ function CitySearch() {
   const [resultsVisible, setResultsVisible] = useState(false)
   const debouncedInput = useDebounce(input, 200)
   const api = new GeocodingApi()
-  const city = useCity()
   const cityDispatch = useCityDispatch()
 
   const handleSearch = async () => {
@@ -123,7 +122,7 @@ function CitySearchResults({
           className="px-2 py-1 hover:bg-sky-50/40 active:bg-sky-50/50 hover:cursor-pointer"
           onClick={() => onSelect(result)}
         >
-          {result.name}
+          {result.name} ({result.country})
         </div>
       ))}
     </div>

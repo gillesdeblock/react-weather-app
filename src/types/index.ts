@@ -8,6 +8,8 @@ export type City = {
   name: string
   longitude: number
   latitude: number
+  country: string
+  country_code: string
 }
 
 export type Weather = {
